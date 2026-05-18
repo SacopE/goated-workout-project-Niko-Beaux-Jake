@@ -117,14 +117,25 @@ def create():
 
     if request.method == "POST":
         # TODO: Get form data (name, height)
-        name = request.form["username"].strip()
-        height = request.form["password"].strip()
+        name = request.form["name"].strip()
+        height = request.form["height"].strip()
         # TODO: Connect to database
+        if not name or not height:
+            error = "Fields cannot be empty"
+        else:
+            conn = get_db()
+            try:
+                conn.execute(
+                    "INSERT INTO entries (name, height) VALUES (?, ?)",
+                    (name, height)
+                )
+                conn.commit()
 
-        # TODO: Insert into entries table
-        # IMPORTANT: include session["user"]
-
-        # TODO: Commit and close
+                return redirect(url_for("dashboard"))
+            except:
+                conn.rollback()
+            finally:
+                conn.close()
 
         return redirect(url_for("dashboard"))
 
